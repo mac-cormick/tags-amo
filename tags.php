@@ -39,6 +39,8 @@ $leads_result = true;
 $i = 0;
 $leads_update_array = [];
 $notes_add_array = [];
+$leads_update = [];
+$notes_add = [];
 
 while ($leads_result) {
 	sleep(1);
@@ -111,13 +113,15 @@ while ($leads_result) {
 			$notes_add_array[] = array('element_id' => $lead_id, 'element_type' => '2', 'note_type' => '4', 'text' => $note_text);
 		}
 	}
+	$leads_update[] = $leads_update_array;
+	$notes_add[] = $notes_add_array;
 }
 
 echo '<pre>';
 echo '<br> UPDATE-LEADS - <br>';
-var_dump($leads_update_array);
+var_dump($leads_update);
 echo '<br> NOTES-ADD - <br>';
-var_dump($notes_add_array);
+var_dump($notes_add);
 echo '</pre>';
 
 //// Удаление тегов из сделок
