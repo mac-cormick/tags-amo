@@ -36,15 +36,15 @@ if(isset($Response['auth'])) #Флаг авторизации доступен �
 }
 
 
-// Добавление сделок
-$tags = ['tag', 'tag1', 'tag-test', '34534'];
+$tags = ['tag', 'tag1', 'tag-test', '34534', 'new!'];
 
+// Добавление сделок с рандомными тегами из массива тегов
 for ($i=0; $i<7; $i++) {
 	sleep(1);
 	$leads = [];
 	for($x=0; $x<500; $x++) {
 		$lead_name = md5(uniqid(rand(), true));
-		$tags_rand_arr = array_rand($tags, 3);
+		$tags_rand_arr = array_rand($tags, 2);
 		$tags_str = '';
 		foreach ($tags_rand_arr as $item) {
 			$tags_str .= $tags[$item] . ',';

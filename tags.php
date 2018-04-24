@@ -29,16 +29,15 @@ $Response=$Response['response'];
 
 if (isset($Response['auth']))
 {
-	echo 'Авторизация прошла успешно';
+	echo 'Авторизация прошла успешно<br>';
 } else {
-	echo 'Ошибка авторизации';
+	echo 'Ошибка авторизации<br>';
 }
 
-$tags_names = ['34534', 'tag-test'];
+$tags_names = ['34534', 'tag-test']; // Теги к удалению
 $leads_result = true;
 $i = 0;
-$leads_update_array = [];
-$notes_add_array = [];
+
 $leads_update = [];
 $notes_add = [];
 
@@ -75,6 +74,8 @@ while ($leads_result) {
 //	echo '</pre>';
 
 	$leads = $leads_result['_embedded']['items'];
+    $leads_update_array = [];
+    $notes_add_array = [];
 
 //	echo '<pre>';
 //	var_dump($leads);
@@ -117,62 +118,64 @@ while ($leads_result) {
 	$notes_add[] = $notes_add_array;
 }
 
-echo '<pre>';
-echo '<br> UPDATE-LEADS - <br>';
-var_dump($leads_update);
-echo '<br> NOTES-ADD - <br>';
-var_dump($notes_add);
-echo '</pre>';
+//echo '<pre>';
+//echo '<br> UPDATE-LEADS - <br>';
+//var_dump($leads_update);
+//echo '<br> NOTES-ADD - <br>';
+//var_dump($notes_add);
+//echo '</pre>';
 
-//// Удаление тегов из сделок
-//if (count($leads_update_array) > 0) {
-//	$data = array (
-//		'update' => $leads_update_array,
-//	);
-//
-//	$link = 'https://'.$subdomain.'.amocrm.ru/api/v2/leads/';
-//
-//	//Curl options
-//	$curl = curl_init();
-//	curl_setopt($curl, CURLOPT_RETURNTRANSFER,true);
-//	curl_setopt($curl, CURLOPT_USERAGENT, "amoCRM-API-client/2.0");
-//	curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
-//	curl_setopt($curl, CURLOPT_POSTFIELDS, http_build_query($data));
-//	curl_setopt($curl, CURLOPT_URL, $link);
-//	curl_setopt($curl, CURLOPT_HEADER,false);
-//	curl_setopt($curl,CURLOPT_COOKIEFILE,dirname(__FILE__)."/cookie.txt");
-//	curl_setopt($curl,CURLOPT_COOKIEJAR,dirname(__FILE__)."/cookie.txt");
-//	$out = curl_exec($curl);
-//	curl_close($curl);
-//	$result = json_decode($out,TRUE);
-//
-////		echo '<pre>';
-////		var_dump($result);
-////		echo '</pre>';
-//
-//
-//	// Добавление примечаний в сделки
-//
-//	$data = array (
-//		'add' => $notes_add_array,
-//	);
-//	$link = 'https://'.$subdomain.'.amocrm.ru/api/v2/notes';
-//
-//	//Curl options
-//	$curl = curl_init();
-//	curl_setopt($curl, CURLOPT_RETURNTRANSFER,true);
-//	curl_setopt($curl, CURLOPT_USERAGENT, "amoCRM-API-client/2.0");
-//	curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
-//	curl_setopt($curl, CURLOPT_POSTFIELDS, http_build_query($data));
-//	curl_setopt($curl, CURLOPT_URL, $link);
-//	curl_setopt($curl, CURLOPT_HEADER,false);
-//	curl_setopt($curl,CURLOPT_COOKIEFILE,dirname(__FILE__)."/cookie.txt");
-//	curl_setopt($curl,CURLOPT_COOKIEJAR,dirname(__FILE__)."/cookie.txt");
-//	$out = curl_exec($curl);
-//	curl_close($curl);
-//	$result = json_decode($out,TRUE);
-//
-//	echo '<pre>';
-//	var_dump($result);
-//	echo '</pre>';
-//}
+// Удаление тегов из сделок
+foreach ($leads_update as $leads_update_item) {
+    sleep(1);
+    $data = array(
+        'update' => $leads_update_item,
+    );
+
+    $link = 'https://'.$subdomain.'.amocrm.ru/api/v2/leads/';
+    $headers[] = "Accept: application/json";
+    //Curl options
+    $curl = curl_init();
+    curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($curl, CURLOPT_USERAGENT, "amoCRM-API-client/2.0");
+    curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
+    curl_setopt($curl, CURLOPT_POSTFIELDS, http_build_query($data));
+    curl_setopt($curl, CURLOPT_URL, $link);
+    curl_setopt($curl, CURLOPT_HEADER, false);
+    curl_setopt($curl, CURLOPT_COOKIEFILE, dirname(__FILE__) . "/cookie.txt");
+    curl_setopt($curl, CURLOPT_COOKIEJAR, dirname(__FILE__) . "/cookie.txt");
+    $out = curl_exec($curl);
+    curl_close($curl);
+    $result = json_decode($out, TRUE);
+
+		echo '<pre>';
+		var_dump($result);
+		echo '</pre>';
+}
+
+// Добавление примечаний в сделки
+foreach ($notes_add as $notes_add_item) {
+    sleep(1);
+	$data = array (
+		'add' => $notes_add_item,
+	);
+	$link = 'https://'.$subdomain.'.amocrm.ru/api/v2/notes';
+    $headers[] = "Accept: application/json";
+	//Curl options
+	$curl = curl_init();
+	curl_setopt($curl, CURLOPT_RETURNTRANSFER,true);
+	curl_setopt($curl, CURLOPT_USERAGENT, "amoCRM-API-client/2.0");
+	curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
+	curl_setopt($curl, CURLOPT_POSTFIELDS, http_build_query($data));
+	curl_setopt($curl, CURLOPT_URL, $link);
+	curl_setopt($curl, CURLOPT_HEADER,false);
+	curl_setopt($curl,CURLOPT_COOKIEFILE,dirname(__FILE__)."/cookie.txt");
+	curl_setopt($curl,CURLOPT_COOKIEJAR,dirname(__FILE__)."/cookie.txt");
+	$out = curl_exec($curl);
+	curl_close($curl);
+	$result = json_decode($out,TRUE);
+
+	echo '<pre>';
+	var_dump($result);
+	echo '</pre>';
+}
