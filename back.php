@@ -96,7 +96,7 @@ while ($leads_result) {
 
 		if (count($tags_to_del) > 0) {
 			$leads_update_array[] = array('id' => $lead_id, 'updated_at' => $lead_updated_at, 'tags' => $leave_tags); // Массив для апдейта сделок
-			$notes_add_array[] = array('element_id' => $lead_id, 'element_type' => '2', 'note_type' => '4', 'text' => $note_text); // Массив для добавления примечаний об удаленных тегах
+			$notes_add_array[] = array('element_id' => $lead_id, 'element_type' => '2', 'note_type' => '25', 'params' => array('text' => $note_text,'service' => 'Удалены теги')); // Массив для добавления примечаний об удаленных тегах
 		}
 		echo '<pre>';
 		var_dump($notes_add_array);

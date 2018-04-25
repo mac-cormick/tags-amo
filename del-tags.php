@@ -7,7 +7,7 @@ $user = array(
 	'USER_LOGIN'=>'amolyakov@team.amocrm.com',
 	'USER_HASH'=>'691c2c8c35794e95be679e7a21d40c40'
 );
-$subdomain = 'newtestdemo';
+$subdomain = 'ananas13';
 $auth = 'https://'.$subdomain.'.amocrm.ru/private/api/auth.php?type=json';
 $ch = curl_init();
 curl_setopt($ch,CURLOPT_RETURNTRANSFER,true);
@@ -96,11 +96,8 @@ while ($leads_result) {
 
 		if (count($tags_to_del) > 0) {
 			$leads_update_array[] = array('id' => $lead_id, 'updated_at' => $lead_updated_at, 'tags' => $leave_tags); // Массив для апдейта сделок
-			$notes_add_array[] = array('element_id' => $lead_id, 'element_type' => '2', 'note_type' => '4', 'text' => $note_text); // Массив для добавления примечаний об удаленных тегах
+			$notes_add_array[] = array('element_id' => $lead_id, 'element_type' => '2', 'note_type' => '25', 'params' => array('text' => $note_text,'service' => 'Удалены теги')); // Массив для добавления примечаний об удаленных тегах
 		}
-		echo '<pre>';
-		var_dump($notes_add_array);
-		echo '</pre>';
 	}
 	$leads_update[] = $leads_update_array;
 	$notes_add[] = $notes_add_array;
@@ -129,9 +126,9 @@ foreach ($leads_update as $leads_update_item) {
 	curl_close($curl);
 	$result = json_decode($out, TRUE);
 
-//	echo '<pre>';
-//	var_dump($result);
-//	echo '</pre>';
+	echo '<pre>';
+	var_dump($result);
+	echo '</pre>';
 }
 
 // Добавление примечаний в сделки
@@ -156,7 +153,7 @@ foreach ($notes_add as $notes_add_item) {
 	curl_close($curl);
 	$result = json_decode($out,TRUE);
 
-//	echo '<pre>';
-//	var_dump($result);
-//	echo '</pre>';
+	echo '<pre>';
+	var_dump($result);
+	echo '</pre>';
 }

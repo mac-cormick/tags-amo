@@ -35,47 +35,34 @@ if(isset($Response['auth'])) #Флаг авторизации доступен �
 	echo 'Ошибка авторизации';
 }
 
+$data = array (
+	'add' =>
+		array (
+			0 =>
+				array (
+					'element_id' => '354339',
+					'element_type' => '2',
+					'note_type' => '25',
+					'params' => array('text' => 'test','service' => 'test_service'),
+				),
+		),
+);
+$link = "https://newtestdemo.amocrm.ru/api/v2/notes";
 
-$tags = ['tag', 'tag1', 'tag-test', '34534', 'теги удаление', 'постоянные клиенты', 'покупочки', 'семинар3'];
-
-// Добавление сделок с рандомными тегами из массива тегов
-for ($i=0; $i<41; $i++) {
-	sleep(1);
-	$leads = [];
-	for($x=0; $x<500; $x++) {
-		$lead_name = md5(uniqid(rand(), true));
-		$tags_rand_arr = array_rand($tags, 5);
-		$tags_str = '';
-		foreach ($tags_rand_arr as $item) {
-			$tags_str .= $tags[$item] . ',';
-		}
-		$leads[] = array('name' => $lead_name, 'tags' => $tags_str);
-	}
-	$data = array (
-		'add' => $leads,
-	);
-
-	$link = 'https://'.$subdomain.'.amocrm.ru/api/v2/leads';
-
-	$headers[] = "Accept: application/json";
+$headers[] = "Accept: application/json";
 
 //Curl options
-	$curl = curl_init();
-	curl_setopt($curl, CURLOPT_RETURNTRANSFER,true);
-	curl_setopt($curl, CURLOPT_USERAGENT, "amoCRM-API-client/2.0");
-	curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
-	curl_setopt($curl, CURLOPT_POSTFIELDS, http_build_query($data));
-	curl_setopt($curl, CURLOPT_URL, $link);
-	curl_setopt($curl, CURLOPT_HEADER,false);
-	curl_setopt($curl,CURLOPT_COOKIEFILE,dirname(__FILE__)."/cookie.txt");
-	curl_setopt($curl,CURLOPT_COOKIEJAR,dirname(__FILE__)."/cookie.txt");
-	$out = curl_exec($curl);
-	curl_close($curl);
-	$result = json_decode($out,TRUE);
+$curl = curl_init();
+curl_setopt($curl, CURLOPT_RETURNTRANSFER,true);
+curl_setopt($curl, CURLOPT_USERAGENT, "amoCRM-API-client-undefined/2.0");
+curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
+curl_setopt($curl, CURLOPT_POSTFIELDS, http_build_query($data));
+curl_setopt($curl, CURLOPT_URL, $link);
+curl_setopt($curl, CURLOPT_HEADER,false);
+curl_setopt($curl,CURLOPT_COOKIEFILE,dirname(__FILE__)."/cookie.txt");
+curl_setopt($curl,CURLOPT_COOKIEJAR,dirname(__FILE__)."/cookie.txt");
+$out = curl_exec($curl);
+curl_close($curl);
+$result = json_decode($out,TRUE);
 
-	echo '<pre>';
-	var_dump($result);
-	echo '</pre>';
-}
-
-
+var_dump($result);
