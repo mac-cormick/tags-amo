@@ -6,26 +6,26 @@ require_once 'functions.php';
 $subdomain = 'newdemonew';
 $login = 'amolyakov@team.amocrm.com';
 $hash = '691c2c8c35794e95be679e7a21d40c40';
-$tags_names = ['tag', 'tag1', 'tag-test', '34534', 'теги удаление', 'постоянные клиенты', 'покупочки']; // Теги к удалению
+$tags_names = ['tag', 'tag1', 'tag-test']; // Теги к удалению
 
 // Авторизация
 $result = auth($subdomain, $login, $hash);
 
 if ($result === TRUE) {
 
-	$rows = 500;
-	$offset = 500;
+	$rows = 3;
+	$offset = 3;
 	$leads_result = true;
 	$i = 0;
 
-	$leads_update = []; // Массив для апдейта всех сделок, в кот найдены теги
-	$notes_add = [];  // Массив для добавления примечаний в сделки
+	$update_array = []; // Массив массивов сделок к апдейту и примечаний к добавлению
 
 	while ($leads_result) {
 		sleep(1);
+		$notes_add_array = [];
+		$leads_update_array = [];
 		$limit_offset = $i*$offset;
 		$i++;
-		echo $i.'<br>';
 
 		// Получение списка сделок
 		$leads_result = get_leads($subdomain, $rows, $limit_offset);
@@ -35,9 +35,6 @@ if ($result === TRUE) {
 		}
 
 		$leads = $leads_result['_embedded']['items']; // Массив сделок
-
-		$leads_update_array = [];
-		$notes_add_array = [];
 
 		foreach ($leads as $lead) {
 			$lead_id = $lead['id'];
@@ -65,28 +62,30 @@ if ($result === TRUE) {
 				$notes_add_array[] = array('element_id' => $lead_id, 'element_type' => '2', 'note_type' => '25', 'params' => array('text' => $note_text,'service' => 'Удалены теги')); // Массив для добавления примечаний об удаленных тегах
 			}
 		}
-		$leads_update[] = $leads_update_array;
-		$notes_add[] = $notes_add_array;
+		$update_array[] = array('leads' => $leads_update_array, 'notes' => $notes_add_array);
 	}
 
-// Удаление тегов из сделок
-	foreach ($leads_update as $leads_update_item) {
+// Удаление тегов и добавление примечаний
+	foreach ($update_array as $update_array_item) {
+		echo count($update_array_item['leads']).' - ';
+		echo count($update_array_item['notes']).'<br>';
 		sleep(1);
-		$data = array(
-			'update' => $leads_update_item,
+		$leads_data = array(
+			'update' => $update_array_item['leads'],
 		);
-		$result = del_tags($subdomain, $data);
-		var_dump($result);
-	}
-
-// Добавление примечаний в сделки
-	foreach ($notes_add as $notes_add_item) {
-		sleep(1);
-		$data = array (
-			'add' => $notes_add_item,
+		$leads_result = del_tags($subdomain, $leads_data);
+		echo '<pre>';
+		var_dump($leads_result);
+		echo '</pre>';
+		echo '<br>';
+		$notes_data = array(
+			'add' => $update_array_item['notes'],
 		);
-		$result = notes_add($subdomain, $data);
-		var_dump($result);
+		$notes_result = notes_add($subdomain, $notes_data);
+		echo '<pre>';
+		var_dump($notes_result);
+		echo '</pre>';
+		echo '<hr>';
 	}
 } else {
 	return $result;
