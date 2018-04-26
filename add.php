@@ -7,7 +7,7 @@ $user = array(
 	'USER_LOGIN'=>'amolyakov@team.amocrm.com', #Ваш логин (электронная почта)
 	'USER_HASH'=>'691c2c8c35794e95be679e7a21d40c40' #Хэш для доступа к API (смотрите в профиле пользователя)
 );
-$subdomain = 'newtestdemo';
+$subdomain = 'newdemonew';
 
 $auth = 'https://'.$subdomain.'.amocrm.ru/private/api/auth.php?type=json';
 $ch = curl_init();
@@ -39,12 +39,12 @@ if(isset($Response['auth'])) #Флаг авторизации доступен �
 $tags = ['tag', 'tag1', 'tag-test', '34534', 'теги удаление', 'постоянные клиенты', 'покупочки', 'семинар3'];
 
 // Добавление сделок с рандомными тегами из массива тегов
-for ($i=0; $i<41; $i++) {
+for ($i=0; $i<10; $i++) {
 	sleep(1);
 	$leads = [];
 	for($x=0; $x<500; $x++) {
 		$lead_name = md5(uniqid(rand(), true));
-		$tags_rand_arr = array_rand($tags, 5);
+		$tags_rand_arr = array_rand($tags, 3);
 		$tags_str = '';
 		foreach ($tags_rand_arr as $item) {
 			$tags_str .= $tags[$item] . ',';

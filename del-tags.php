@@ -7,7 +7,7 @@ $user = array(
 	'USER_LOGIN'=>'amolyakov@team.amocrm.com',
 	'USER_HASH'=>'691c2c8c35794e95be679e7a21d40c40'
 );
-$subdomain = 'ananas13';
+$subdomain = 'newdemonew';
 $auth = 'https://'.$subdomain.'.amocrm.ru/private/api/auth.php?type=json';
 $ch = curl_init();
 curl_setopt($ch,CURLOPT_RETURNTRANSFER,true);
@@ -43,13 +43,13 @@ $notes_add = [];  // Массив для добавления примечани
 
 while ($leads_result) {
 	sleep(1);
-	$limit_offset = $i*500;
+	$limit_offset = $i*50;
 	$i++;
 	echo $i;
 
 	// Получение списка сделок по 500
 
-	$link = 'https://'.$subdomain.'.amocrm.ru/api/v2/leads?limit_rows=500&limit_offset='.$limit_offset;
+	$link = 'https://'.$subdomain.'.amocrm.ru/api/v2/leads?limit_rows=50&limit_offset='.$limit_offset;
 	echo $link;
 	$headers[] = "Accept: application/json";
 
@@ -125,10 +125,6 @@ foreach ($leads_update as $leads_update_item) {
 	$out = curl_exec($curl);
 	curl_close($curl);
 	$result = json_decode($out, TRUE);
-
-	echo '<pre>';
-	var_dump($result);
-	echo '</pre>';
 }
 
 // Добавление примечаний в сделки
@@ -152,8 +148,4 @@ foreach ($notes_add as $notes_add_item) {
 	$out = curl_exec($curl);
 	curl_close($curl);
 	$result = json_decode($out,TRUE);
-
-	echo '<pre>';
-	var_dump($result);
-	echo '</pre>';
 }
