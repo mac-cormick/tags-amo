@@ -1,5 +1,7 @@
 <?php
 
+require_once "const.php";
+
 function auth($subdomain, $login, $hash){
 	$user = array(
 		'USER_LOGIN' => $login,
@@ -32,14 +34,13 @@ function notes_add($subdomain, $data) {
 	return $result;
 }
 
-function make_updates_array($subdomain, $rows, $offset, $tags_names) {
+function make_updates_files($subdomain, $rows, $offset, $tags_names) {
     $leads_result = true;
     $i = 0;
 
-    $update_array = []; // Массив массивов сделок к апдейту и примечаний к добавлению
-
     while ($leads_result) {
         sleep(1);
+		$update_array = []; // Массив массивов сделок к апдейту и примечаний к добавлению
         $notes_add_array = [];
         $leads_update_array = [];
         $limit_offset = $i*$offset;
@@ -49,14 +50,17 @@ function make_updates_array($subdomain, $rows, $offset, $tags_names) {
         $leads_result = get_leads($subdomain, $rows, $limit_offset);
 
         if (!is_array($leads_result)) {
+        	echo "Список сделок пуст ".$leads_result."\n\n";
             break;
         }
 
         $leads = $leads_result['_embedded']['items']; // Массив сделок
+		echo "Сделок: ".count($leads)."\n";
 
         foreach ($leads as $lead) {
             $lead_id = $lead['id'];
-            $lead_updated_at = time();
+            $periods = [time(), 1493305791];
+            $lead_updated_at = array_rand($periods, 1);
             $lead_tags_names = [];
             $leave_tags = '';
             $lead_tags = $lead['tags'];
@@ -76,13 +80,19 @@ function make_updates_array($subdomain, $rows, $offset, $tags_names) {
             }
 
             if (count($tags_to_del) > 0) {
-                $leads_update_array[] = array('id' => $lead_id, 'updated_at' => $lead_updated_at, 'tags' => $leave_tags); // Массив для апдейта сделок
-                $notes_add_array[] = array('element_id' => $lead_id, 'element_type' => '2', 'note_type' => '25', 'params' => array('text' => $note_text,'service' => 'Удалены теги')); // Массив для добавления примечаний об удаленных тегах
+                $leads_update_array[] = array('id' => $lead_id, 'updated_at' => $periods[$lead_updated_at], 'tags' => $leave_tags); // Массив для апдейта сделок
+                $notes_add_array[] = array('element_id' => $lead_id, 'element_type' => 2, 'note_type' => 25, 'params' => array('text' => $note_text,'service' => 'Удалены теги')); // Массив для добавления примечаний об удаленных тегах
             }
         }
-        $update_array[] = array($leads_update_array, $notes_add_array);
+        if (count($leads_update_array) > 0) {
+        	echo "Сделок к апдейту: ".count($leads_update_array)."\n";
+			$update_array[] = array($leads_update_array, $notes_add_array);
+			$files_put_result = file_put_contents(APP_DIR."/files/updates".$i.".json", json_encode($update_array));
+		} else {
+        	echo "Сделок к апдейту: 0\n";
+		}
     }
-    return $update_array;
+    return $files_put_result;
 }
 
 function init($subdomain, $url, $data=null) {
