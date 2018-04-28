@@ -80,7 +80,7 @@ function make_updates_files($subdomain, $rows, $offset, $tags_names) {
             }
 
             if (count($tags_to_del) > 0) {
-                $leads_update_array[] = array('id' => $lead_id, 'updated_at' => $periods[$lead_updated_at], 'tags' => $leave_tags); // Массив для апдейта сделок
+                $leads_update_array[] = array('id' => $lead_id, 'tags' => $leave_tags); // Массив для апдейта сделок
                 $notes_add_array[] = array('element_id' => $lead_id, 'element_type' => 2, 'note_type' => 25, 'params' => array('text' => $note_text,'service' => 'Удалены теги')); // Массив для добавления примечаний об удаленных тегах
             }
         }

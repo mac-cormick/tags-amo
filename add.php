@@ -30,19 +30,19 @@ $Response=$Response['response'];
 
 if(isset($Response['auth'])) #Флаг авторизации доступен в свойстве "auth"
 {
-	echo 'Авторизация прошла успешно';
+	echo "Авторизация прошла успешно\n";
 } else {
-	echo 'Ошибка авторизации';
+	echo "Ошибка авторизации\n";
 }
 
 
 $tags = ['tag', 'tag1', '2454-234', '4341-qwer', 'qwerqwe!', 'tag-test', '34534', 'теги удаление', 'постоянные клиенты', 'покупочки', 'семинар3'];
 
 // Добавление сделок с рандомными тегами из массива тегов
-for ($i=0; $i<1; $i++) {
+for ($i=0; $i<6; $i++) {
 	sleep(1);
 	$leads = [];
-	for($x=0; $x<25; $x++) {
+	for($x=0; $x<450; $x++) {
 		$lead_name = md5(uniqid(rand(), true));
 		$tags_rand_arr = array_rand($tags, 3);
 		$tags_str = '';
@@ -73,9 +73,13 @@ for ($i=0; $i<1; $i++) {
 	curl_close($curl);
 	$result = json_decode($out,TRUE);
 
-	echo '<pre>';
-	var_dump($result);
-	echo '</pre>';
+	if (is_array($result)) {
+		echo count($result["_embedded"]["items"]) . " сделок добавлено\n";
+	}
+
+//	echo '<pre>';
+//	var_dump($result);
+//	echo '</pre>';
 }
 
 
