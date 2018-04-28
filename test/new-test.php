@@ -38,7 +38,7 @@ if(isset($Response['auth'])) #Флаг авторизации доступен �
 $headers[] = "Accept: application/json";
 $leads_array = [];
 
-for ($i=0; $i<5; $i++) {
+for ($i=0; $i<8; $i++) {
 	sleep(1);
 	$offset = $i*500;
 	$i++;
@@ -69,7 +69,7 @@ foreach ($leads_array as $leads_array_item) {
 	foreach ($leads_array_item as $item) {
 		$lead_id = $item['id'];
 		$time = time();
-		$tags = 'tag,tag1,34534';
+		$tags = 'taaerdf,t32444445ag1,34sfa-g534,adfdf';
 
 		$update_array[] = array('id' => $lead_id, 'updated_at' => $time, 'tags' => $tags);
 	}
@@ -93,7 +93,14 @@ curl_setopt($curl,CURLOPT_COOKIEFILE,dirname(__FILE__)."/cookie.txt");
 curl_setopt($curl,CURLOPT_COOKIEJAR,dirname(__FILE__)."/cookie.txt");
 $out = curl_exec($curl);
 curl_close($curl);
-$result = json_decode($out,TRUE);
+$code=(int)$code;
+if($code != 200) {
+	echo 'Error: '.$code;
+} else {
+	$out = json_decode($out, TRUE);
+	var_dump($out);
+}
+//$result = json_decode($out,TRUE);
 
 var_dump($result);
 

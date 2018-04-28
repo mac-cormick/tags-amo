@@ -36,6 +36,7 @@ function notes_add($subdomain, $data) {
 
 function make_updates_files($subdomain, $rows, $offset, $tags_names) {
     $leads_result = true;
+	$files_put_result = 0;
     $i = 0;
 
     while ($leads_result) {
@@ -59,8 +60,6 @@ function make_updates_files($subdomain, $rows, $offset, $tags_names) {
 
         foreach ($leads as $lead) {
             $lead_id = $lead['id'];
-            $periods = [time(), 1493305791];
-            $lead_updated_at = array_rand($periods, 1);
             $lead_tags_names = [];
             $leave_tags = '';
             $lead_tags = $lead['tags'];
