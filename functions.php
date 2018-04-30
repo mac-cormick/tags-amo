@@ -36,12 +36,12 @@ function notes_add($subdomain, $data) {
 
 function make_updates_files($subdomain, $rows, $offset, $tags_names) {
     $leads_result = true;
-	$files_put_result = 0;
     $i = 0;
+    $leads_update_file_put_result = [];
+    $notes_add_file_put_result = [];
 
     while ($leads_result) {
         sleep(1);
-		$update_array = []; // Массив массивов сделок к апдейту и примечаний к добавлению
         $notes_add_array = [];
         $leads_update_array = [];
         $limit_offset = $i*$offset;
@@ -51,7 +51,7 @@ function make_updates_files($subdomain, $rows, $offset, $tags_names) {
         $leads_result = get_leads($subdomain, $rows, $limit_offset);
 
         if (!is_array($leads_result)) {
-        	echo "Список сделок пуст ".$leads_result."\n\n";
+        	echo "Список сделок пуст\n\n";
             break;
         }
 
@@ -79,19 +79,23 @@ function make_updates_files($subdomain, $rows, $offset, $tags_names) {
             }
 
             if (count($tags_to_del) > 0) {
-                $leads_update_array[] = array('id' => $lead_id, 'tags' => $leave_tags); // Массив для апдейта сделок
-                $notes_add_array[] = array('element_id' => $lead_id, 'element_type' => 2, 'note_type' => 25, 'params' => array('text' => $note_text,'service' => 'Удалены теги')); // Массив для добавления примечаний об удаленных тегах
+                $leads_update_array = array('id' => $lead_id, 'tags' => $leave_tags); // Массив для апдейта сделок
+                $leads_update_file_put_result[] = file_put_contents(__DIR__ . "/files/tags-update.json", json_encode($leads_update_array) . "\n", FILE_APPEND);
+                $notes_add_array = array('element_id' => $lead_id, 'element_type' => 2, 'note_type' => 25, 'params' => array('text' => $note_text,'service' => 'Удалены теги')); // Массив для добавления примечаний об удаленных тегах
+                $notes_add_file_put_result[] = file_put_contents(__DIR__ . "/files/notes-add.json", json_encode($notes_add_array) . "\n", FILE_APPEND);
             }
         }
-        if (count($leads_update_array) > 0) {
-        	echo "Сделок к апдейту: ".count($leads_update_array)."\n";
-			$update_array[] = array($leads_update_array, $notes_add_array);
-			$files_put_result = file_put_contents(APP_DIR."/files/updates".$i.".json", json_encode($update_array));
+        if (count($leads_update_file_put_result) == count($notes_add_file_put_result)) {
+        	echo "Сделок к апдейту: ".count($leads_update_file_put_result)."\n";
 		} else {
         	echo "Сделок к апдейту: 0\n";
 		}
     }
-    return $files_put_result;
+    if (in_array(FALSE, $leads_update_file_put_result) || in_array(FALSE, $notes_add_file_put_result)) {
+        return false;
+    } else {
+        return true;
+    }
 }
 
 function init($subdomain, $url, $data=null) {
