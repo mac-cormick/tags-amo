@@ -34,7 +34,7 @@ function notes_add($subdomain, $data) {
 	return $result;
 }
 
-function make_updates_files($subdomain, $rows, $offset, $tags_names) {
+function prepare_updates_files($subdomain, $rows, $offset, $tags_names) {
     $leads_result = true;
     $i = 0;
     $leads_update_file_put_result = [];
@@ -98,6 +98,73 @@ function make_updates_files($subdomain, $rows, $offset, $tags_names) {
     }
 }
 
+function make_updates($subdomain, $count) {
+    $i = 0;
+    // Получение массивов для апдейта из json файлов
+    $leads_update_file_open = fopen(__DIR__ . '/files/tags-update.json', 'r');
+    $notes_add_file_open = fopen(__DIR__ . '/files/notes-add.json', 'r');
+    if ($leads_update_file_open && $notes_add_file_open) {
+        $leads_update_item = TRUE;
+        $notes_add_item = TRUE;
+        while ($leads_update_item && $notes_add_item) {
+            $leads_update_array = [];
+            $notes_add_array = [];
+            $i++;
+            sleep(1);
+            for ($x=0; $x<$count; $x++) {
+                $leads_update_item = fgets($leads_update_file_open);
+                if ($leads_update_item) {
+                    $leads_update_item_array = json_decode($leads_update_item, true);
+                    $leads_update_item_array['updated_at'] = time(); // Дозапись параметра updated_at в массив для апдейта
+                    $leads_update_array[] = $leads_update_item_array;
+                }
+                $notes_add_item = fgets($notes_add_file_open);
+                if ($notes_add_item) {
+                    $notes_add_array[] = json_decode($notes_add_item, true);
+                }
+            }
+            if (count($leads_update_array) == 0) break;
+            $leads_data = array(
+                'update' => $leads_update_array,
+            );
+            $notes_data = array(
+                'add' => $notes_add_array,
+            );
+            echo "Удаление тегов из " . count($leads_update_array) . " сделок...\n";
+            $leads_result = del_tags($subdomain, $leads_data);
+            if ($leads_result == 504) {
+                echo "Не удалось обновить " . $count . " сделок. Количество уменьшено в 2 раза";
+                return make_updates($subdomain, $count/2);
+            }
+            if (!is_array($leads_result)) {
+                // При ошибке запроса пишем номер запроса и ошибки, пропускаем добавление примечаний
+                file_put_contents(__DIR__ . "/files/leads-update-errors.txt", $i . ' - ' . $leads_result . "\n", FILE_APPEND);
+                echo $i . " Ошибка при апдейте сделок - " . $leads_result . "\n";
+                continue;
+            }
+            if ($leads_result_errors = $leads_result['_embedded']['errors']) {
+                // При неудачном апдейте пишем лог ошибок данной итерации, пропускаем добавление примечаний
+                file_put_contents(__DIR__ . "/files/leads-update-errors.json", json_encode($leads_result_errors), FILE_APPEND);
+                continue;
+            }
+            echo "Добавление примечаний в " . count($notes_add_array) . " сделок...\n";
+            $notes_result = notes_add($subdomain, $notes_data);
+            if (!is_array($notes_result)) {
+                // При ошибке запроса пишем номер запроса и ошибки, пропускаем добавление примечаний
+                file_put_contents(__DIR__ . "/files/notes-update-errors.txt", $i . ' - ' . $notes_result . "\n", FILE_APPEND);
+                echo $i . " Ошибка при добавлении примечания - " . $notes_result . "\n";
+            }
+            if ($notes_result_errors = $notes_result['_embedded']['errors']) {
+                // При неудачном апдейте пишем лог ошибок данной итерации, пропускаем добавление примечаний
+                file_put_contents(__DIR__ . "/files/notes-add-errors.json", json_encode($notes_result_errors), FILE_APPEND);
+            }
+        }
+        fclose($leads_update_file_open);
+        fclose($notes_add_file_open);
+    }
+    return TRUE;
+}
+
 function init($subdomain, $url, $data=null) {
 	$link = 'https://' . $subdomain . '.amocrm.ru' . $url;
 
@@ -116,7 +183,7 @@ function init($subdomain, $url, $data=null) {
 	curl_close($ch);
 	$code=(int)$code;
 	if($code != 200) {
-		return 'Error: '.$code;
+		return $code;
 	} else {
 		$out = json_decode($out, TRUE);
 		return $out;
