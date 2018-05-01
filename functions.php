@@ -34,7 +34,7 @@ function notes_add($subdomain, $data) {
 	return $result;
 }
 
-function prepare_updates_files($subdomain, $rows, $offset, $tags_names) {
+function prepare_updates_files($subdomain, $rows, $offset, $tags_names_array) {
     $leads_result = true;
     $i = 0;
     $leads_update_file_put_result = [];
@@ -42,8 +42,6 @@ function prepare_updates_files($subdomain, $rows, $offset, $tags_names) {
 
     while ($leads_result) {
         sleep(1);
-        $notes_add_array = [];
-        $leads_update_array = [];
         $limit_offset = $i*$offset;
         $i++;
 
@@ -67,8 +65,8 @@ function prepare_updates_files($subdomain, $rows, $offset, $tags_names) {
             foreach ($lead_tags as $lead_tag) {
                 $lead_tags_names[] = $lead_tag['name'];
             }
-            $tags_to_del = array_intersect($lead_tags_names, $tags_names); // Теги к удалению в сделке
-            $leave_tags_arr = array_diff($lead_tags_names, $tags_names); // Теги - остаются в сделке
+            $tags_to_del = array_intersect($lead_tags_names, $tags_names_array); // Теги к удалению в сделке
+            $leave_tags_arr = array_diff($lead_tags_names, $tags_names_array); // Теги - остаются в сделке
             foreach ($leave_tags_arr as $leave_tag) {
                 $leave_tags .= $leave_tag . ',';
             }
@@ -133,7 +131,7 @@ function make_updates($subdomain, $count) {
             echo "Удаление тегов из " . count($leads_update_array) . " сделок...\n";
             $leads_result = del_tags($subdomain, $leads_data);
             if ($leads_result == 504) {
-                echo "Не удалось обновить " . $count . " сделок. Количество уменьшено в 2 раза";
+                echo "Не удалось обновить " . $count . " сделок. Количество уменьшено в 2 раза\n";
                 return make_updates($subdomain, $count/2);
             }
             if (!is_array($leads_result)) {
