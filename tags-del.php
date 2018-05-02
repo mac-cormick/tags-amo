@@ -4,6 +4,13 @@ ini_set('max_execution_time', 10800);
 
 require_once 'functions.php';
 
+// Параметры по умолчанию
+$login = 'amolyakov@team.amocrm.com';
+$hash = '691c2c8c35794e95be679e7a21d40c40';
+$count = 500;
+$errors = [];
+
+// Получение параметров
 $params = [
     '' => 'help',
     's:' => 'subdomain:',
@@ -12,12 +19,6 @@ $params = [
     'c::' => 'count::',
     't:' => 'tags:'
 ];
-
-// Default values
-$login = 'amolyakov@team.amocrm.com';
-$hash = '691c2c8c35794e95be679e7a21d40c40';
-$count = 500;
-$errors = [];
 
 $options = getopt(implode('', array_keys($params)), $params);
 
@@ -66,17 +67,21 @@ Example:
     }
     die($help);
 }
+
 $tags_names_array = explode(',', $tags);
 
 // Авторизация
 $result = auth($subdomain, $login, $hash);
 
 if ($result === TRUE) {
-	$rows = 500;
-	$offset = 500;
+    echo "Авторизация пройдена успешно\n";
+	$rows = 5;
+	$offset = 5;
 
+	// Формиирование файлов для апдейта и доб. примечаний
     $prepare_updates = prepare_updates_files($subdomain, $rows, $offset, $tags_names_array); // Запись данных для запросов апдейта сделок и добавления примечаний в json файлы
-	if ($prepare_updates) {
+	// Выполнение апдейта и доб. примечаний по $count сделок за итерацию
+    if ($prepare_updates) {
 		$make_updates = make_updates($subdomain, $count);
 	} else {
 		echo "Ошибки записи файлов\n";

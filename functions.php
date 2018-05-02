@@ -37,8 +37,8 @@ function notes_add($subdomain, $data) {
 function prepare_updates_files($subdomain, $rows, $offset, $tags_names_array) {
     $leads_result = true;
     $i = 0;
-    $leads_update_file_put_result = [];
-    $notes_add_file_put_result = [];
+    $leads_update_file_put_result = []; // Массив результатов записи в файл данных для апдейта сделок
+    $notes_add_file_put_result = [];    // Маассив результатов записи в файл данных для добавления примечаний
 
     while ($leads_result) {
         sleep(1);
@@ -50,28 +50,29 @@ function prepare_updates_files($subdomain, $rows, $offset, $tags_names_array) {
 
         if (!is_array($leads_result)) {
         	echo "Список сделок пуст\n\n";
+        	$leads_result = false;
             break;
         }
 
         $leads = $leads_result['_embedded']['items']; // Массив сделок
-		echo "Сделок: ".count($leads)."\n";
+		echo "Поиск по: ".count($leads)." сделкам...\n";
 
         foreach ($leads as $lead) {
             $lead_id = $lead['id'];
-            $lead_tags_names = [];
-            $leave_tags = '';
+            $lead_tags_names = [];      // Массив имен тегов в сделке
+            $leave_tags = '';           // Строка тегов, кот. останутся после апдейта - для запроса апдейта
             $lead_tags = $lead['tags'];
+            $note_text = "";            // Строка списка удаленных тегов для примечания
 
             foreach ($lead_tags as $lead_tag) {
                 $lead_tags_names[] = $lead_tag['name'];
             }
             $tags_to_del = array_intersect($lead_tags_names, $tags_names_array); // Теги к удалению в сделке
-            $leave_tags_arr = array_diff($lead_tags_names, $tags_names_array); // Теги - остаются в сделке
+            $leave_tags_arr = array_diff($lead_tags_names, $tags_names_array);   // Теги - остаются в сделке
             foreach ($leave_tags_arr as $leave_tag) {
                 $leave_tags .= $leave_tag . ',';
             }
 
-            $note_text = "";
             foreach ($tags_to_del as $tag_to_del) {
                 $note_text .= $tag_to_del . ' ';
             }
@@ -84,7 +85,7 @@ function prepare_updates_files($subdomain, $rows, $offset, $tags_names_array) {
             }
         }
         if (count($leads_update_file_put_result) == count($notes_add_file_put_result)) {
-        	echo "Сделок к апдейту: ".count($leads_update_file_put_result)."\n";
+        	echo "Всего сделок к апдейту: ".count($leads_update_file_put_result)."\n";
 		} else {
         	echo "Сделок к апдейту: 0\n";
 		}
@@ -109,6 +110,7 @@ function make_updates($subdomain, $count) {
             $notes_add_array = [];
             $i++;
             sleep(1);
+            // Получение данных для запросов из файлов по $count для одной итерации
             for ($x=0; $x<$count; $x++) {
                 $leads_update_item = fgets($leads_update_file_open);
                 if ($leads_update_item) {
@@ -130,30 +132,31 @@ function make_updates($subdomain, $count) {
             );
             echo "Удаление тегов из " . count($leads_update_array) . " сделок...\n";
             $leads_result = del_tags($subdomain, $leads_data);
+            // Уменьшение $count в 2 раза при Timeout
             if ($leads_result == 504) {
                 echo "Не удалось обновить " . $count . " сделок. Количество уменьшено в 2 раза\n";
                 return make_updates($subdomain, $count/2);
             }
             if (!is_array($leads_result)) {
-                // При ошибке запроса пишем номер запроса и ошибки, пропускаем добавление примечаний
+                // При ошибке запроса апдейта сделки пишем номер запроса и код ошибки, пропускаем добавление примечаний
                 file_put_contents(__DIR__ . "/files/leads-update-errors.txt", $i . ' - ' . $leads_result . "\n", FILE_APPEND);
                 echo $i . " Ошибка при апдейте сделок - " . $leads_result . "\n";
                 continue;
             }
             if ($leads_result_errors = $leads_result['_embedded']['errors']) {
-                // При неудачном апдейте пишем лог ошибок данной итерации, пропускаем добавление примечаний
+                // При наличии ошибок данной итерации пишем лог, пропускаем добавление примечаний
                 file_put_contents(__DIR__ . "/files/leads-update-errors.json", json_encode($leads_result_errors), FILE_APPEND);
                 continue;
             }
             echo "Добавление примечаний в " . count($notes_add_array) . " сделок...\n";
             $notes_result = notes_add($subdomain, $notes_data);
             if (!is_array($notes_result)) {
-                // При ошибке запроса пишем номер запроса и ошибки, пропускаем добавление примечаний
+                // При ошибке запроса добавления примечаний пишем номер запроса и код ошибки
                 file_put_contents(__DIR__ . "/files/notes-update-errors.txt", $i . ' - ' . $notes_result . "\n", FILE_APPEND);
                 echo $i . " Ошибка при добавлении примечания - " . $notes_result . "\n";
             }
             if ($notes_result_errors = $notes_result['_embedded']['errors']) {
-                // При неудачном апдейте пишем лог ошибок данной итерации, пропускаем добавление примечаний
+                // При наличии ошибок данной итерации пишем лог
                 file_put_contents(__DIR__ . "/files/notes-add-errors.json", json_encode($notes_result_errors), FILE_APPEND);
             }
         }
