@@ -112,43 +112,47 @@ function prepare_leads_update_file($subdomain, $count, $tags_names, $offset=NULL
 function make_updates($subdomain, $count) {
     $i = 0;
     // Получение массивов для апдейта из json файлов
-    $leads_update_file_open = fopen(__DIR__ . '/tags-update.json', 'r');
-    $notes_add_file_open = fopen(__DIR__ . '/notes-add.json', 'r');
-    if ($leads_update_file_open && $notes_add_file_open) {
+    $leads_update_file_open = fopen(__DIR__ . "/update-files/tags-update.json", 'r');
+//    $notes_add_file_open = fopen(__DIR__ . '/notes-add.json', 'r');
+    if ($leads_update_file_open) {
         $leads_update_item = TRUE;
-        $notes_add_item = TRUE;
-        while ($leads_update_item && $notes_add_item) {
+//        $notes_add_item = TRUE;
+        while ($leads_update_item) {
             $leads_update_array = [];
-            $notes_add_array = [];
+//            $notes_add_array = [];
             $i++;
             sleep(1);
             // Получение данных для запросов из файлов по $count для одной итерации
-            for ($x=0; $x<$count; $x++) {
-                $leads_update_item = fgets($leads_update_file_open);
-                if ($leads_update_item) {
-                    $leads_update_item_array = json_decode($leads_update_item, true);
-                    $leads_update_item_array['updated_at'] = time(); // Дозапись параметра updated_at в массив для апдейта
-                    $leads_update_array[] = $leads_update_item_array;
-                }
-                $notes_add_item = fgets($notes_add_file_open);
-                if ($notes_add_item) {
-                    $notes_add_array[] = json_decode($notes_add_item, true);
-                }
-            }
-            if (count($leads_update_array) == 0) break;
-            $leads_data = array(
-                'update' => $leads_update_array,
-            );
-            $notes_data = array(
-                'add' => $notes_add_array,
-            );
-            echo "Удаление тегов из " . count($leads_update_array) . " сделок...\n";
-            $leads_result = del_tags($subdomain, $leads_data);
-            // Уменьшение $count в 2 раза при Timeout
-            if ($leads_result == 504) {
-                echo "Не удалось обновить " . $count . " сделок. Количество уменьшено в 2 раза\n";
-                return make_updates($subdomain, $count/2);
-            }
+//            for ($x=0; $x<$count; $x++) {
+//                $leads_update_item = fgets($leads_update_file_open);
+//                if ($leads_update_item) {
+//                    $leads_update_item_array = json_decode($leads_update_item, true);
+//                    $leads_update_item_data = $leads_update_item_array['update'];
+//                    $leads_update_item_old_tags = $leads_update_item_array['old_tags'];
+////                    var_dump($leads_update_item_array);
+//                    $leads_update_item_data['updated_at'] = time(); // Дозапись параметра updated_at в массив для апдейта
+//                    $leads_update_array[] = $leads_update_item_array;
+//                }
+////                $notes_add_item = fgets($notes_add_file_open);
+////                if ($notes_add_item) {
+////                    $notes_add_array[] = json_decode($notes_add_item, true);
+////                }
+//            }
+//            if (count($leads_update_array) == 0) break;
+//            $leads_data = array(
+//                'update' => $leads_update_array,
+//            );
+////            $notes_data = array(
+////                'add' => $notes_add_array,
+////            );
+//            echo "Удаление тегов из " . count($leads_update_array) . " сделок...\n";
+//            $leads_result = del_tags($subdomain, $leads_data);
+//            // Уменьшение $count в 2 раза при Timeout
+//            if ($leads_result == 504) {
+//                echo "Не удалось обновить " . $count . " сделок. Количество уменьшено в 2 раза\n";
+//                return make_updates($subdomain, $count/2);
+//            }
+            $leads_result = make_update_iteration($subdomain, $count, $leads_update_file_open);
             if (!is_array($leads_result)) {
                 // При ошибке запроса апдейта сделки пишем номер запроса и код ошибки, пропускаем добавление примечаний
                 file_put_contents(__DIR__ . "/leads-update-errors.txt", $i . ' - ' . $leads_result . "\n", FILE_APPEND);
@@ -160,22 +164,55 @@ function make_updates($subdomain, $count) {
                 file_put_contents(__DIR__ . "/leads-update-errors.json", json_encode($leads_result_errors), FILE_APPEND);
                 continue;
             }
-            echo "Добавление примечаний в " . count($notes_add_array) . " сделок...\n";
-            $notes_result = notes_add($subdomain, $notes_data);
-            if (!is_array($notes_result)) {
-                // При ошибке запроса добавления примечаний пишем номер запроса и код ошибки
-                file_put_contents(__DIR__ . "/notes-update-errors.txt", $i . ' - ' . $notes_result . "\n", FILE_APPEND);
-                echo $i . " Ошибка при добавлении примечания - " . $notes_result . "\n";
-            }
-            if ($notes_result_errors = $notes_result['_embedded']['errors']) {
-                // При наличии ошибок данной итерации пишем лог
-                file_put_contents(__DIR__ . "/notes-add-errors.json", json_encode($notes_result_errors), FILE_APPEND);
-            }
+//            echo "Добавление примечаний в " . count($notes_add_array) . " сделок...\n";
+//            $notes_result = notes_add($subdomain, $notes_data);
+//            if (!is_array($notes_result)) {
+//                // При ошибке запроса добавления примечаний пишем номер запроса и код ошибки
+//                file_put_contents(__DIR__ . "/notes-update-errors.txt", $i . ' - ' . $notes_result . "\n", FILE_APPEND);
+//                echo $i . " Ошибка при добавлении примечания - " . $notes_result . "\n";
+//            }
+//            if ($notes_result_errors = $notes_result['_embedded']['errors']) {
+//                // При наличии ошибок данной итерации пишем лог
+//                file_put_contents(__DIR__ . "/notes-add-errors.json", json_encode($notes_result_errors), FILE_APPEND);
+//            }
         }
         fclose($leads_update_file_open);
-        fclose($notes_add_file_open);
+//        fclose($notes_add_file_open);
     }
     return TRUE;
+}
+
+function make_update_iteration($subdomain, $count, $descriptor) {
+    $leads_update_array = [];
+    for ($x=0; $x<$count; $x++) {
+        $leads_update_item = fgets($descriptor);
+        if ($leads_update_item) {
+            $leads_update_item_array = json_decode($leads_update_item, true);
+            $leads_update_item_data = $leads_update_item_array['update'];
+            $leads_update_item_old_tags = $leads_update_item_array['old_tags'];
+//                    var_dump($leads_update_item_array);
+            $leads_update_item_data['updated_at'] = time(); // Дозапись параметра updated_at в массив для апдейта
+            $leads_update_array[] = $leads_update_item_array;
+        }
+//                $notes_add_item = fgets($notes_add_file_open);
+//                if ($notes_add_item) {
+//                    $notes_add_array[] = json_decode($notes_add_item, true);
+//                }
+    }
+    $leads_data = array(
+        'update' => $leads_update_array,
+    );
+//            $notes_data = array(
+//                'add' => $notes_add_array,
+//            );
+    echo "Удаление тегов из " . count($leads_update_array) . " сделок...\n";
+    $leads_result = del_tags($subdomain, $leads_data);
+    // Уменьшение $count в 2 раза при Timeout
+    if ($leads_result == 504) {
+        echo "Не удалось обновить " . $count . " сделок. Количество уменьшено в 2 раза\n";
+        return make_update_iteration($subdomain, $count/2, $descriptor);
+    }
+    return $leads_result;
 }
 
 function init($subdomain, $url, $data=null) {
