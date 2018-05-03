@@ -42,7 +42,7 @@ $tags = ['tag', 'tag1', '2454-234', 'new-tag', '4341-qwer', 'qwerqwe!', 'tag-tes
 for ($i=0; $i<1; $i++) {
 	sleep(1);
 	$leads = [];
-	for($x=0; $x<20; $x++) {
+	for($x=0; $x<30; $x++) {
 		$lead_name = md5(uniqid(rand(), true));
 		$tags_rand_arr = array_rand($tags, 3);
 		$tags_str = '';
