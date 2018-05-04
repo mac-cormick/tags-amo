@@ -81,7 +81,7 @@ if ($result === TRUE) {
 	echo "Авторизация пройдена успешно\n";
 
 	// Формиирование файлов для апдейта и доб. примечаний
-	$leads_update_count = prepare_leads_update_file($subdomain, $rows, $tags_names); // Запись данных для запросов апдейта сделок и добавления примечаний в json файлы
+	$leads_update_count = prepare_update_file($subdomain, $rows, $tags_names); // Запись данных для запросов апдейта сделок и добавления примечаний в json файлы
 	if (($leads_update_count) > 0) {
 		echo "Всего сделок к апдейту: " . $leads_update_count ."\n";
 	} else {
