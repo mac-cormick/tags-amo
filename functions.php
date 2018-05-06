@@ -75,7 +75,6 @@ function prepare_update_file($subdomain, $count, $tags_names, $offset=NULL) {
     $leads_result = TRUE;
     $i = 0;
     $leads_update_file_put_result = []; // Массив результатов записи в файл данных для апдейта сделок
-//    $notes_add_file_put_result = [];    // Маассив результатов записи в файл данных для добавления примечаний
 
     while ($leads_result) {
         sleep(1);
@@ -141,13 +140,15 @@ function prepare_update_file($subdomain, $count, $tags_names, $offset=NULL) {
 }
 
 function make_updates($subdomain, $dir, $run_again=true) {
-    $i = 0;
+    global $position;
     $make_updates_results = [];
 	$leads_result = TRUE;
     $leads_update_file_open = fopen(__DIR__ . "/" . $dir . "/tags-update.json", 'r');
+    if (isset($position) && $run_again==true) {
+        fseek($leads_update_file_open, $position);
+    }
     if ($leads_update_file_open) {
         while ($leads_result) {
-            $i++;
             sleep(1);
             $leads_result = make_update_iteration($subdomain, $leads_update_file_open, $run_again);
             if ($leads_result !== FALSE) {
