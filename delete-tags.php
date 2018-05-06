@@ -68,9 +68,21 @@ if ($auth_result === TRUE) {
 
     // Выполнение апдейта и доб. примечаний по $count сделок за итерацию
     if (file_exists(__DIR__ . "/update-files/tags-update.json")) {
-        $make_updates = make_updates($subdomain, $count);
+        $dir = 'update-files';
+        $make_updates_results = make_updates($subdomain, $dir);
     } else {
         echo "Файл апдейта не существует\n";
+    }
+
+    // Выполнение второго прохода при наличии ошибок апдейта
+    if (count($make_updates_results)) {
+        $dir = 'run-again';
+        if (file_exists(__DIR__ . "/run-again/tags-update.json")) {
+            echo "Есть ошибки апдейта. Запуск прохода скрипта по файлу неудачных апдейтов\n";
+            $run_again_updates_results = make_updates($subdomain, $dir, false);
+        }
+    } else {
+        echo "Нет удачных результатов апдейта\n";
     }
 } else {
     echo "Ошибка авторизации\n";
