@@ -4,6 +4,7 @@
     <list default="true" id="e5008801-d363-4a33-9c0e-5a43321033dc" name="Default" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/add.php" beforeDir="false" afterPath="$PROJECT_DIR$/add.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backups/tags.json" beforeDir="false" afterPath="$PROJECT_DIR$/backups/tags.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backups/updated-items.json" beforeDir="false" afterPath="$PROJECT_DIR$/backups/updated-items.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cookie.txt" beforeDir="false" afterPath="$PROJECT_DIR$/cookie.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/delete-tags.php" beforeDir="false" afterPath="$PROJECT_DIR$/delete-tags.php" afterDir="false" />
@@ -36,8 +37,8 @@
       <file leaf-file-name="functions.php" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/functions.php">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="51">
-              <caret line="3" column="17" selection-start-line="3" selection-start-column="12" selection-end-line="3" selection-end-column="17" />
+            <state relative-caret-position="187">
+              <caret line="135" column="9" lean-forward="true" selection-start-line="135" selection-start-column="9" selection-end-line="135" selection-end-column="9" />
             </state>
           </provider>
         </entry>
@@ -45,17 +46,17 @@
       <file leaf-file-name="delete-tags.php" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/delete-tags.php">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="476">
-              <caret line="28" column="50" selection-start-line="28" selection-start-column="50" selection-end-line="28" selection-end-column="50" />
+            <state relative-caret-position="408">
+              <caret line="62" column="16" selection-start-line="62" selection-start-column="16" selection-end-line="62" selection-end-column="16" />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="add.php" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/add.php">
+      <file leaf-file-name="make-update-file.php" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/make-update-file.php">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="765">
-              <caret line="45" column="40" selection-start-line="45" selection-start-column="40" selection-end-line="45" selection-end-column="40" />
+            <state relative-caret-position="204">
+              <caret line="22" column="61" selection-start-line="22" selection-start-column="61" selection-end-line="22" selection-end-column="61" />
             </state>
           </provider>
         </entry>
@@ -64,14 +65,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>$i</find>
-      <find>теги</find>
-      <find>удалены</find>
-      <find>testo</find>
-      <find>удален</find>
-      <find>note_text</find>
-      <find>var_dump</find>
-      <find>$leads_update</find>
       <find>$x</find>
       <find>ошибка</find>
       <find>$notes_add_array</find>
@@ -84,16 +77,24 @@
       <find>$tags_names_array</find>
       <find>count($ta</find>
       <find>time()</find>
-      <find />
+      <find>при а</find>
       <find>$leave_tags</find>
       <find>$notes_result</find>
       <find>var_d</find>
       <find>backup</find>
       <find>обновлен</find>
       <find>echo</find>
-      <find />
-      <find />
+      <find>апдейт сдело</find>
+      <find>нет уд</find>
       <find>удаление</find>
+      <find>array</find>
+      <find>tags.j</find>
+      <find>/2</find>
+      <find>/</find>
+      <find>заросов</find>
+      <find>поиск</find>
+      <find>leads_update_file</find>
+      <find>сделок к</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -118,8 +119,8 @@
         <option value="$PROJECT_DIR$/make-leads-update-file.php" />
         <option value="$PROJECT_DIR$/make-update-file.php" />
         <option value="$PROJECT_DIR$/add.php" />
-        <option value="$PROJECT_DIR$/functions.php" />
         <option value="$PROJECT_DIR$/delete-tags.php" />
+        <option value="$PROJECT_DIR$/functions.php" />
       </list>
     </option>
   </component>
@@ -144,18 +145,18 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
             <path>
               <item name="tags" type="b2602c69:ProjectViewProjectNode" />
-              <item name="tags" type="2a2b976b:PhpTreeStructureProvider$1" />
+              <item name="tags" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
         </subPane>
       </pane>
-      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -211,18 +212,19 @@
       <workItem from="1525625583338" duration="1500000" />
       <workItem from="1525629197810" duration="91000" />
       <workItem from="1525629831579" duration="5282000" />
-      <workItem from="1525638233856" duration="250000" />
+      <workItem from="1525638233856" duration="780000" />
+      <workItem from="1525639627680" duration="3384000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="230781000" />
+    <option name="totallyTimeSpent" value="234695000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1382" height="744" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" weight="0.2322239" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.2322239" />
       <window_info anchor="bottom" id="TODO" order="6" />
       <window_info anchor="bottom" id="Docker" order="7" show_stripe_button="false" />
       <window_info anchor="bottom" id="Event Log" order="7" side_tool="true" />
@@ -236,8 +238,8 @@
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
-      <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" id="Commander" order="0" weight="0.4" />
+      <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" id="JSON Viewer" order="3" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.3295325" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
@@ -247,18 +249,18 @@
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
       <window_info anchor="bottom" id="Docker" order="10" show_stripe_button="false" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
-      <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.21267454" />
       <window_info id="Structure" order="1" weight="0.25" />
       <window_info anchor="right" id="Commander" order="0" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="bottom" id="TODO" order="6" />
+      <window_info anchor="bottom" id="Version Control" order="8" />
       <window_info anchor="bottom" id="Run" order="2" />
       <window_info anchor="bottom" id="Find" order="1" />
       <window_info anchor="right" id="Database" order="3" />
       <window_info anchor="bottom" id="Terminal" order="9" />
       <window_info anchor="bottom" id="Event Log" order="7" side_tool="true" />
-      <window_info anchor="bottom" id="Version Control" order="8" />
+      <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info id="Favorites" order="2" side_tool="true" />
@@ -563,31 +565,31 @@
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/errors/leads-update-request-errors.json" />
-    <entry file="file://$PROJECT_DIR$/make-update-file.php">
+    <entry file="file://$PROJECT_DIR$/add.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="450">
-          <caret line="61" column="27" selection-start-line="61" selection-start-column="27" selection-end-line="61" selection-end-column="35" />
+        <state relative-caret-position="102">
+          <caret line="37" selection-start-line="37" selection-end-line="37" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/add.php">
+    <entry file="file://$PROJECT_DIR$/make-update-file.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="765">
-          <caret line="45" column="40" selection-start-line="45" selection-start-column="40" selection-end-line="45" selection-end-column="40" />
+        <state relative-caret-position="204">
+          <caret line="22" column="61" selection-start-line="22" selection-start-column="61" selection-end-line="22" selection-end-column="61" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/delete-tags.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="476">
-          <caret line="28" column="50" selection-start-line="28" selection-start-column="50" selection-end-line="28" selection-end-column="50" />
+        <state relative-caret-position="408">
+          <caret line="62" column="16" selection-start-line="62" selection-start-column="16" selection-end-line="62" selection-end-column="16" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/functions.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="51">
-          <caret line="3" column="17" selection-start-line="3" selection-start-column="12" selection-end-line="3" selection-end-column="17" />
+        <state relative-caret-position="187">
+          <caret line="135" column="9" lean-forward="true" selection-start-line="135" selection-start-column="9" selection-end-line="135" selection-end-column="9" />
         </state>
       </provider>
     </entry>
