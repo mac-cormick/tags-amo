@@ -48,21 +48,16 @@ function init($subdomain, $url, $data=null) {
     curl_setopt($ch, CURLOPT_COOKIEJAR, dirname(__FILE__).'/cookie.txt');
     curl_setopt($ch, CURLINFO_HEADER_OUT, true);
     $out = curl_exec($ch);
-    $code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
     $info = curl_getinfo($ch);
     curl_close($ch);
-    $code=(int)$code;
-    if($code != 200) {
-        return ['info' => $info, 'body' => $data];
-    } else {
-        $out = json_decode($out, TRUE);
-        return ['info' => $info, 'body' => $data, 'out' => $out];
-    }
+    $out = json_decode($out, true);
+    $result = ['info' => $info, 'body' => $data, 'out' => $out];
+    return $result;
 }
 
 function check_notes_result($result) {
     $notes = $result['out']['_embedded']['items'];
-    if ($result['info']['http_code'] != 200) {
+    if (isset($result['out']['response']['error'])) {
         file_put_contents(__DIR__ . "/errors/notes-add-request-errors.json", json_encode($result) . "\n", FILE_APPEND);
         echo "Ошибка запроса добавления примечаний - " . $result['info']['http_code'] . "\n";
     } elseif ($result_errors = $result['out']['_embedded']['errors']) {
@@ -91,7 +86,7 @@ function prepare_update_file($subdomain, $count, $tags_names, $offset=NULL) {
         $leads_result = get_leads($subdomain, $count, $limit_offset);
 
 		// Проверка результата запроса сделок
-        if ($leads_result['info']['http_code'] != 200) {
+        if (isset($leads_result['out']['response']['error'])) {
             echo "Ошибка при получении сделок на запросе с оффсетом - " . $limit_offset . "\n";
             file_put_contents(__DIR__ . "/errors/leads-get-errors.json", json_encode($leads_result) . "\n", FILE_APPEND);
             break;
@@ -106,6 +101,7 @@ function prepare_update_file($subdomain, $count, $tags_names, $offset=NULL) {
 
         foreach ($leads as $lead) {
             $lead_id = $lead['id'];
+            $lead_updated_at = $lead['updated_at'];
             $lead_tags_names = [];      // Массив имен тегов в сделке
             $lead_tags = $lead['tags'];
 
@@ -122,7 +118,7 @@ function prepare_update_file($subdomain, $count, $tags_names, $offset=NULL) {
 
             if (count($tags_to_del) > 0) {
                 $leads_update = [  // Массив для апдейта сделок
-                	'update' => ['id' => $lead_id, 'tags' => $leave_tags],
+                	'update' => ['id' => $lead_id, 'updated_at' => $lead_updated_at, 'tags' => $leave_tags],
 					'notes_add' => ['element_id' => $lead_id, 'element_type' => 2, 'note_type' => 25, 'params' => ['text' => $note_text, 'service' => 'Удалены теги']]
 				];
                 if (($file_put_size = file_put_contents(__DIR__ . "/update-files/tags-update.json", json_encode($leads_update) . "\n", FILE_APPEND) > 0)) {
@@ -170,13 +166,17 @@ function make_update_iteration($subdomain, $descriptor, $run_again=true) {
     for ($x=0; $x<$count; $x++) {
         $leads_update_item_json = fgets($descriptor);
 		if ($leads_update_item_json) {
+			$current_time = time();
 			// Копируем прочитанную строку в новый файл(на случай падения скрипта во время апдейта)
 			file_put_contents(__DIR__ . "/backups/updated-items.json", $leads_update_item_json, FILE_APPEND);
             $leads_update_item_decoded = json_decode($leads_update_item_json, true);
             $leads_update_items[] = $leads_update_item_decoded; // Массив с данными по сделкам данной итерации для формирования в случ. ошибок файлов логов и повторного запуска
             $leads_update_item_data = $leads_update_item_decoded['update'];
+            if ($leads_update_item_data['updated_at'] > $current_time) {
+				$current_time = $leads_update_item_data['updated_at'] + 10;
+			}
             $notes_add_item_data = $leads_update_item_decoded['notes_add'];
-            $leads_update_item_data['updated_at'] = time(); // Дозапись параметра updated_at в массив для апдейта
+            $leads_update_item_data['updated_at'] = $current_time; // Дозапись параметра updated_at в массив для апдейта
             $leads_update_request_data[] = $leads_update_item_data;
             $notes_add_request_data[] = $notes_add_item_data;
         }
@@ -198,7 +198,7 @@ function make_update_iteration($subdomain, $descriptor, $run_again=true) {
 		    $count = ceil($count);
 			return make_update_iteration($subdomain, $descriptor);
 		}
-		if ($leads_result['info']['http_code'] != 200) {
+		if (isset($leads_result['out']['response']['error'])) {
 			if ($run_again) {
 				// При ошибке запроса апдейта сделок пишем массив данных запроса в файл для повторного запуска, примечания не добавляем
 				foreach ($leads_update_items as $leads_update_item) {

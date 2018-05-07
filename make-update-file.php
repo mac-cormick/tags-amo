@@ -11,8 +11,8 @@ $offset = 0;
 $params = [
 	''    => 'help',
 	's:'  => 'subdomain:',
-	'l:' => 'login::',
-	'h:' => 'hash::',
+	'l:'  => 'login::',
+	'h:'  => 'hash::',
 	'c::' => 'rows::',
 	't:'  => 'tags:',
 	'o::' => 'offset'
@@ -60,6 +60,7 @@ Options:
         -h  --hash         API-ключ
         -r  --rows         Количество сделок, получаемых одной итерацией
         -o --offset        Параметр limit_offset (если скрипт упадет во время получения сделок)
+        -t --tags          Список тегов к удалению(через запятую)
 Example:
         php make-update-file.php --subdomain=subname --login=login@yandex.ru --hash=12345678900987654321 --rows=500 --offset=35000 --tags=tag1,tag2,tag3
 ";
@@ -71,6 +72,7 @@ Example:
 }
 
 $tags_names = explode(',', $tags);
+var_dump($tags_names);
 
 // Авторизация
 $result = auth($subdomain, $login, $hash);

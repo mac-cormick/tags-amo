@@ -48,7 +48,7 @@ $data = array (
 				),
 		),
 );
-$link = "https://testovii3.amocrm.ru/api/v2/leads/";
+$link = "https://testovii3.amocrm.ru/api/v2/leas/";
 
 $headers[] = "Accept: application/json";
 
