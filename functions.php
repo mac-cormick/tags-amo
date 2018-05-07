@@ -7,7 +7,7 @@ function auth($subdomain, $login, $hash){
 	];
 	$url = '/private/api/auth.php?type=json';
 	$result = init($subdomain, $url, $user);
-	if (is_array($result) && $result['response']['auth'] == TRUE) {
+	if (is_array($result['out']) && $result['out']['response']['auth'] == TRUE) {
 		return TRUE;
 	} else {
 		return $result;
@@ -56,16 +56,16 @@ function init($subdomain, $url, $data=null) {
         return ['info' => $info, 'body' => $data];
     } else {
         $out = json_decode($out, TRUE);
-        return $out;
+        return ['info' => $info, 'body' => $data, 'out' => $out];
     }
 }
 
 function check_notes_result($result) {
-    $notes = $result['_embedded']['items'];
-    if (isset($result['info']['http_code'])) {
+    $notes = $result['out']['_embedded']['items'];
+    if ($result['info']['http_code'] != 200) {
         file_put_contents(__DIR__ . "/errors/notes-add-request-errors.json", json_encode($result) . "\n", FILE_APPEND);
         echo "Ошибка запроса добавления примечаний - " . $result['info']['http_code'] . "\n";
-    } elseif ($result_errors = $result['_embedded']['errors']) {
+    } elseif ($result_errors = $result['out']['_embedded']['errors']) {
         file_put_contents(__DIR__ . "/errors/notes-add-result-errors.json", json_encode($result) . "\n", FILE_APPEND);
     } else {
         echo "Добавлены примечания в " . count($notes) . " сделок\n";
@@ -89,16 +89,15 @@ function prepare_update_file($subdomain, $count, $tags_names, $offset=NULL) {
 
         // Получение списка сделок
         $leads_result = get_leads($subdomain, $count, $limit_offset);
-//        var_dump($leads_result);
 
 		// Проверка результата запроса сделок
-        if (isset($leads_result['http_code'])) {
+        if ($leads_result['info']['http_code'] != 200) {
             echo "Ошибка при получении сделок на запросе с оффсетом - " . $limit_offset . "\n";
             file_put_contents(__DIR__ . "/errors/leads-get-errors.json", json_encode($leads_result) . "\n", FILE_APPEND);
             break;
 		}
 
-        $leads = $leads_result['_embedded']['items']; // Массив сделок
+        $leads = $leads_result['out']['_embedded']['items']; // Массив сделок
         if (count($leads) == 0) {
             echo "0 сделок получено\n";
             break;
@@ -155,7 +154,6 @@ function make_updates($subdomain, $dir, $run_again=true) {
             if ($leads_result !== FALSE) {
                 $make_updates_results[] = $leads_result;
             }
-//            var_dump($leads_result);
         }
         fclose($leads_update_file_open);
     }
@@ -178,8 +176,6 @@ function make_update_iteration($subdomain, $descriptor, $run_again=true) {
             $leads_update_items[] = $leads_update_item_decoded; // Массив с данными по сделкам данной итерации для формирования в случ. ошибок файлов логов и повторного запуска
             $leads_update_item_data = $leads_update_item_decoded['update'];
             $notes_add_item_data = $leads_update_item_decoded['notes_add'];
-//            $time = [time(), time()-99999];
-//            $time_key = array_rand($time);
             $leads_update_item_data['updated_at'] = time(); // Дозапись параметра updated_at в массив для апдейта
             $leads_update_request_data[] = $leads_update_item_data;
             $notes_add_request_data[] = $notes_add_item_data;
@@ -192,19 +188,17 @@ function make_update_iteration($subdomain, $descriptor, $run_again=true) {
 		$notes_data = [
 			'add' => $notes_add_request_data,
 		];
-//	var_dump($leads_data);
 		echo "Удаление тегов из " . count($leads_update_request_data) . " сделок...\n";
 		$leads_result = del_tags($subdomain, $leads_data);
-//		var_dump($leads_result);
 		// Уменьшение $count в 2 раза при Timeout
-		if (isset($leads_result['info']['http_code']) && $leads_result['info']['http_code'] == 504) {
+		if ($leads_result['info']['http_code'] == 504) {
             echo "504 Timeout при попытке обновления " . count($leads_update_request_data) . " сделок. Количество получаемых строк уменьшено в 2 раза\n";
 		    fseek($descriptor, $file_position); // Перемещение дескриптора в позицию, с кот. началось чтение файла текущей итерации
 		    $count /= 2;
 		    $count = ceil($count);
 			return make_update_iteration($subdomain, $descriptor);
 		}
-		if (isset($leads_result['info']['http_code'])) {
+		if ($leads_result['info']['http_code'] != 200) {
 			if ($run_again) {
 				// При ошибке запроса апдейта сделок пишем массив данных запроса в файл для повторного запуска, примечания не добавляем
 				foreach ($leads_update_items as $leads_update_item) {
@@ -215,7 +209,7 @@ function make_update_iteration($subdomain, $descriptor, $run_again=true) {
 				file_put_contents(__DIR__ . "/errors/leads-update-request-errors.json", json_encode($leads_result) . "\n", FILE_APPEND);
 			}
 			echo "Ошибка запроса апдейта сделок - " . $leads_result['info']['http_code'] . "\nСписок сделок записан в файл для повторного запуска\n";
-		} elseif ($leads_result_errors = $leads_result['_embedded']['errors']['update']) {
+		} elseif ($leads_result_errors = $leads_result['out']['_embedded']['errors']['update']) {
 			if ($run_again) {
 				// При наличии ошибок данной итерации пишем массив данных по неудавшимся апдейтам в файл для повторного запуска
 				foreach ($leads_result_errors as $lead_id => $error_text) {
@@ -227,21 +221,21 @@ function make_update_iteration($subdomain, $descriptor, $run_again=true) {
 				}
 			} else {
 				// При наличии ошибок после повторного запуска пишем логи
-				file_put_contents(__DIR__ . "/errors/leads-update-result-errors.json", json_encode($leads_result['_embedded']['errors']) . "\n", FILE_APPEND);
+				file_put_contents(__DIR__ . "/errors/leads-update-result-errors.json", json_encode($leads_result) . "\n", FILE_APPEND);
 				foreach ($leads_result_errors as $lead_id => $error_text) {
 					// Удаляем из массива данных для добавления примечаний элементы, соответствующие неудавшимся апдейтам сделок
 					$notes_add_request_data_item_key = array_search($lead_id, array_column($notes_add_request_data, 'element_id'));
 					unset($notes_add_request_data[$notes_add_request_data_item_key]);
 				}
 			}
-            echo "Обновлено " . count($leads_result['_embedded']['items']) . "\n" . count($leads_result['_embedded']['errors']['update']) . " сделок записано в файл для повторного запуска\n";
+            echo "Обновлено " . count($leads_result['out']['_embedded']['items']) . "\n" . count($leads_result['out']['_embedded']['errors']['update']) . " сделок записано в файл для повторного запуска\n";
 			$notes_data = [
 				'add' => $notes_add_request_data,
 			];
 			$notes_result = notes_add($subdomain, $notes_data);
             check_notes_result($notes_result);
 		} else {
-		    echo count($leads_result['_embedded']['items']) . " сделок обновлено\n";
+		    echo count($leads_result['out']['_embedded']['items']) . " сделок обновлено\n";
 			$notes_result = notes_add($subdomain, $notes_data);
             check_notes_result($notes_result);
 		}

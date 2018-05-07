@@ -3,8 +3,6 @@
 require_once __DIR__ . "/functions.php";
 
 // Параметры по умолчанию
-$login = 'amolyakov@team.amocrm.com';
-$hash = '691c2c8c35794e95be679e7a21d40c40';
 $rows = 500;
 $errors = [];
 $offset = 0;
@@ -13,8 +11,8 @@ $offset = 0;
 $params = [
 	''    => 'help',
 	's:'  => 'subdomain:',
-	'l::' => 'login::',
-	'h::' => 'hash::',
+	'l:' => 'login::',
+	'h:' => 'hash::',
 	'c::' => 'rows::',
 	't:'  => 'tags:',
 	'o::' => 'offset'
